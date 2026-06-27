@@ -1,5 +1,5 @@
 @echo off
-REM ===== cfb-merge one-time setup (Windows) =====
+REM ===== Madden Franchise Merge - one-time setup (Windows) =====
 cd /d "%~dp0"
 
 where node >nul 2>nul

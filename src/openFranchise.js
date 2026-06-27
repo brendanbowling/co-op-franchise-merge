@@ -2,8 +2,8 @@
 
 /**
  * Thin wrapper over the `madden-franchise` library so the rest of the tool
- * never touches the library directly. When the format lineage carries to
- * CFB 27, only this file (plus the title config) should need attention.
+ * never touches the library directly. When the format lineage carries to a
+ * new title, only this file (plus the title config) should need attention.
  */
 
 const path = require('path');

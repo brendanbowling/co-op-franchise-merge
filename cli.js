@@ -2,8 +2,8 @@
 'use strict';
 
 /**
- * cfb-merge — read-only franchise parser + diff scaffolding.
- * Built against Madden 26 (madden-franchise lib), designed to repoint at CFB 27.
+ * Madden NFL 26 Offline Franchise Merge — command-line interface.
+ * Built on the madden-franchise library.
  *
  * Commands:
  *   inspect  <save> [--game madden26] [--filter <substr>] [--json]
@@ -126,7 +126,7 @@ async function main() {
 
 function usageExit(line) {
   if (line) console.error('Usage: node cli.js ' + line);
-  else console.error(`cfb-merge commands:
+  else console.error(`Madden Franchise Merge — commands:
   inspect  <save> [--game madden26] [--filter <substr>] [--json]
   snapshot <save> --out <file.json> [--game madden26] [--limit N]
   diff     <baseline.json> <modified.json> [--out <report.json>]

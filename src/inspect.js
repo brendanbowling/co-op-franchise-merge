@@ -3,7 +3,7 @@
 /**
  * INSPECT: open a save and print every table with id, capacity, and how many
  * records are actually populated. This is the first thing you run against a
- * CFB 27 save to discover real table names (which then go into the config).
+ * new title's save to discover real table names (which then go into the config).
  */
 
 const { openFranchise, fileMeta, safe } = require('./openFranchise');

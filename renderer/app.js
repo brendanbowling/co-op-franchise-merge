@@ -10,7 +10,7 @@ document.querySelectorAll('button[data-pick]').forEach((btn) => {
   btn.addEventListener('click', async () => {
     const key = btn.dataset.pick;
     const labels = { baseline: 'shared starting save', host: 'your save', guest: "partner's played save" };
-    const p = await window.cfb.pickSave(`Select the ${labels[key]}`);
+    const p = await window.api.pickSave(`Select the ${labels[key]}`);
     if (!p) return;
     files[key] = p;
     document.getElementById(key).value = p;
@@ -31,7 +31,7 @@ previewBtn.addEventListener('click', async () => {
     return;
   }
   show('Reading saves…');
-  const res = await window.cfb.preview({ ...files, game: 'madden26' });
+  const res = await window.api.preview({ ...files, game: 'madden26' });
   if (!res.ok) { show('Error: ' + esc(res.error), 'error'); mergeBtn.disabled = true; return; }
 
   if (!res.games.length) {
@@ -59,12 +59,12 @@ previewBtn.addEventListener('click', async () => {
 
 mergeBtn.addEventListener('click', async () => {
   const suggested = (files.host.split(/[\\/]/).pop() || 'CAREER') + '-MERGED';
-  const outPath = await window.cfb.pickOutput(suggested);
+  const outPath = await window.api.pickOutput(suggested);
   if (!outPath) return;
 
   show('Merging…');
   mergeBtn.disabled = true;
-  const res = await window.cfb.apply({ ...files, out: outPath, game: 'madden26' });
+  const res = await window.api.apply({ ...files, out: outPath, game: 'madden26' });
   if (!res.ok) { show('Merge failed: ' + esc(res.error), 'error'); return; }
 
   const applied = Object.entries(res.applied)
