@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline';" />
+  <title>Madden NFL 26 Offline Franchise Merge</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <h1>Madden NFL 26 <span class="sub">Offline Franchise Merge — co-op</span></h1>
+
+  <p class="intro">
+    Brings one player's <b>played game</b> into the shared save — result, player stats (season &amp;
+    career), standings, and box score. Pick the three files, preview what will come in, then merge.
+    Your files are <b>read-only</b>: the merge only writes the new output file you name; nothing else
+    on your computer is touched.
+  </p>
+
+  <section class="pickers">
+    <div class="picker">
+      <label>1. Shared starting save <span class="hint">(this week, before anyone played)</span></label>
+      <div class="row"><input id="baseline" readonly placeholder="No file selected" /><button data-pick="baseline">Choose…</button></div>
+    </div>
+    <div class="picker">
+      <label>2. Your save <span class="hint">(source of truth — merged into)</span></label>
+      <div class="row"><input id="host" readonly placeholder="No file selected" /><button data-pick="host">Choose…</button></div>
+    </div>
+    <div class="picker">
+      <label>3. Partner's played save <span class="hint">(what to merge from)</span></label>
+      <div class="row"><input id="guest" readonly placeholder="No file selected" /><button data-pick="guest">Choose…</button></div>
+    </div>
+  </section>
+
+  <div class="actions">
+    <button id="previewBtn" class="primary">Preview merge</button>
+    <button id="mergeBtn" class="go" disabled>Merge →</button>
+  </div>
+
+  <section id="output" class="output hidden"></section>
+
+  <p class="note">
+    What's merged: game result, player season stats (league leaders), standings (W/L record),
+    career totals, per-player game logs, and the team/player box score. Madden NFL 26 offline
+    franchise only. (College Football 27 and Madden 27 support are planned for after those games ship.)
+  </p>
+
+  <script src="app.js"></script>
+</body>
+</html>

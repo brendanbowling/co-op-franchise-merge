@@ -1,0 +1,21 @@
+# Vendored dependencies (restore with `npm install`)
+node_modules/
+
+# Generated snapshot/diff output
+snapshots/
+
+# Throwaway experiment/diagnostic scripts (Phase 0 / 4 recon)
+exp_*.js
+
+# Save-file backups created by the merge engine
+*.bak-*
+
+# Local Claude Code settings (machine-specific)
+.claude/settings.local.json
+
+# Packaged app output (electron-builder)
+dist/
+
+# OS / editor cruft
+Thumbs.db
+.DS_Store

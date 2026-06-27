@@ -1,0 +1,51 @@
+{
+  "name": "co-op-franchise-merge",
+  "version": "0.1.0",
+  "description": "Madden NFL 26 offline-franchise co-op save merge tool.",
+  "main": "main.js",
+  "scripts": {
+    "app": "electron .",
+    "selftest": "node cli.js selftest",
+    "inspect": "node cli.js inspect",
+    "snapshot": "node cli.js snapshot",
+    "diff": "node cli.js diff",
+    "merge": "node cli.js merge",
+    "dist": "electron-builder --win",
+    "pack": "electron-builder --win --dir"
+  },
+  "keywords": ["madden", "franchise", "save-editor", "co-op", "offline"],
+  "author": "Brendan Bowling",
+  "license": "MIT",
+  "dependencies": {
+    "madden-franchise": "^4.2.2"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "bin": {
+    "co-op-franchise-merge": "cli.js"
+  },
+  "build": {
+    "appId": "com.maddenfranchisemerge.app",
+    "productName": "Madden 26 Offline Franchise Merge",
+    "artifactName": "Madden26-Offline-Franchise-Merge-Setup-${version}.${ext}",
+    "files": [
+      "main.js",
+      "preload.js",
+      "src/**/*",
+      "config/**/*",
+      "renderer/**/*",
+      "!**/*.map"
+    ],
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "deleteAppDataOnUninstall": true
+    }
+  }
+}

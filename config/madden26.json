@@ -1,0 +1,118 @@
+{
+  "title": "madden26",
+  "displayName": "Madden NFL 26",
+  "schema": {
+    "comment": "M26 schema ships with madden-franchise. Leave null to auto-pick by file header. Set schemaDirectory/schemaOverride only if auto-pick fails.",
+    "schemaDirectory": null,
+    "schemaOverride": null
+  },
+  "tables": {
+    "comment": "Table names + fields CONFIRMED against CAREER-TEST-SOURCE via inspect/snapshot (Madden 26, 1896 tables). Only SeasonGame has an in-row natural key. The stat tables carry NO in-row player/team identity (the row<->player mapping lives in separate pointer tables and is stable within a season), so positional (#index) identity is CORRECT for them — empty keyFields here is intentional, not a TODO. The 'using positional identity' warning on those tables is expected.",
+    "definitions": [
+      {
+        "name": "SeasonGame",
+        "keyFields": ["SeasonYear", "SeasonWeek", "HomeTeam", "AwayTeam"],
+        "trackFields": [],
+        "note": "THE game results table (id 4156, cap 429): schedule + final scores (HomeScore/AwayScore + per-quarter), GameStatus, IsSimmed. The headline transplant unit. Real natural key (year+week+teams) so the same game matches across two different saves."
+      },
+      {
+        "name": "GameOffensiveStats",
+        "keyFields": [],
+        "trackFields": [],
+        "note": "PER-GAME offensive player stats (id 4105, cap 7700). The core transplant unit from User B."
+      },
+      {
+        "name": "GameDefensiveStats",
+        "keyFields": [],
+        "trackFields": [],
+        "note": "PER-GAME defensive player stats (id 4163, cap 13500). Transplant unit."
+      },
+      {
+        "name": "GameKickingStats",
+        "keyFields": [],
+        "trackFields": [],
+        "note": "PER-GAME kicking stats (id 4178, cap 1500). Transplant unit."
+      },
+      {
+        "name": "SeasonOffensiveStats",
+        "keyFields": [],
+        "trackFields": [],
+        "note": "SEASON aggregate offense (id 4259, cap 4400). RECOMPUTE TARGET — does this update from game rows on week-advance?"
+      },
+      {
+        "name": "SeasonDefensiveStats",
+        "keyFields": [],
+        "trackFields": [],
+        "note": "SEASON aggregate defense (id 4202, cap 7500). Recompute target."
+      },
+      {
+        "name": "SeasonKickingStats",
+        "keyFields": [],
+        "trackFields": [],
+        "note": "SEASON aggregate kicking (id 4205, cap 825). Recompute target."
+      },
+      {
+        "name": "CareerOffensiveStats",
+        "keyFields": [],
+        "trackFields": [],
+        "note": "CAREER aggregate offense (id 4299, cap 1100). Recompute target (career rollup)."
+      },
+      {
+        "name": "TeamStats",
+        "keyFields": [],
+        "trackFields": [],
+        "note": "Team season totals / standings inputs (id 4107, cap 920). Recompute target for standings."
+      },
+      {
+        "name": "PlayerAward",
+        "keyFields": [],
+        "trackFields": [],
+        "note": "Player awards (id 4229, cap 989). Recompute target — do weekly/season awards regenerate?"
+      },
+      {
+        "name": "Player",
+        "keyFields": [],
+        "trackFields": [],
+        "note": "Roster/attributes (id 4222, cap 3960, 334 cols). Detect roster/progression deltas."
+      }
+    ],
+    "ignoreFields": ["__id", "isEmpty"]
+  },
+  "merge": {
+    "comment": "v1 PROVEN-IN-GAME transplant (results + season leaders). Playing a game makes Madden pre-sim the rest of the week for the ticker (provisional: IsSimmed=true, HasBeenPublished=false) — ignored via humanGameFilter, which selects ONLY the guest's actually-played official games. Copy the RESULT (allowlisted SeasonGame fields) + the SEASON player stats (clean — provisional sims don't commit season stats). NOT YET WORKING (see STANDINGS_NOTES.md / PHASE4_MERGE_DESIGN.md), so SKIPPED: standings/TeamStats (engine record-keeping can't be faked via file edits — 6 transplant pieces tried, no effect), career (polymorphic player->career mapping), box score (*StatCache reference tree). When standings is cracked, add tables here — the GUI needs no change.",
+    "resultTable": "SeasonGame",
+    "humanGameFilter": { "IsSimmed": false, "HasBeenPublished": true, "SeasonWeekType": "RegularSeason" },
+    "resultFields": [
+      "HomeScore", "AwayScore",
+      "HomeScoreQuarter1", "HomeScoreQuarter2", "HomeScoreQuarter3", "HomeScoreQuarter4", "HomeScoreOT",
+      "AwayScoreQuarter1", "AwayScoreQuarter2", "AwayScoreQuarter3", "AwayScoreQuarter4", "AwayScoreOT",
+      "GameStatus", "IsSimmed", "HasBeenPublished", "NumberTimesPlayed",
+      "HomeTeamStatus", "AwayTeamStatus"
+    ],
+    "aggregateTables": [
+      "SeasonOffensiveStats", "SeasonDefensiveStats", "SeasonKickingStats"
+    ],
+    "careerStatsComment": "CAREER totals: each player has ONE cumulative career row via Player.CareerStats (direct ref to a position-specific Career*Stats table; no holder). The baseline-vs-guest diff for career is POLLUTED by provisional CPU sims (~172 rows change, but only the ~68 human-game players are real), so career is transplanted by a SEPARATE identity-scoped pass — NOT the positional diff path — copying each human-game player's career row guest->host. Career rows pre-exist for every player (even debuts), so no allocation needed.",
+    "careerStats": true,
+    "boxScoreComment": "BOX SCORE (per-game player line / player-card game log): built from Player.GameStats -> GameStats[] holder -> per-game Game*Stats rows (each carries SeasonGame + OpposingTeam refs, NO player back-ref; SeasonGame.*PlayerStatCache is empty for ALL games and unused). For each human-game player we find their merged-game Game row via THEIR guest holder, allocate the row in host (copy scalars + the two refs verbatim since SeasonGame/Team align), and link it into a free GameStats holder slot. gameTables lists the per-game stat tables to transplant.",
+    "boxScore": true,
+    "gameTables": ["GameOffensiveStats", "GameDefensiveStats", "GameKickingStats"],
+    "teamBoxScoreComment": "TEAM box score (the game's box-score PAGE team-totals tab). SOLVED + CONFIRMED IN-GAME 2026-06-26. The page renders team totals from THREE things, all required: (1) allocate the 2 per-game TeamStats rows guest->host (at the free-list head nextRecordToUse — same-index copy CORRUPTS the free list) and point SeasonGame.{Home,Away}TeamStatCache at them; (2) link each allocated row into that team's Team.TeamGameStatsRegSeason array at the WEEK-INDEXED slot the guest used (the page reads totals from THIS array, not the cache alone — caches set + array missing => 0s); (3) set SeasonGame.{Home,Away}TeamStatus=Reported (in resultFields). The earlier 'needs player snapshots / all-or-nothing' theory was WRONG: a known-good played game has HomePlayerStatCache/AwayPlayerStatCache=NULL and (often) ScoringSummaries=NULL yet renders team totals fine. Logos come from SeasonGame.Home/AwayTeam (already correct), NOT the scalar TeamStats row. STILL NOT built: the scoring-PLAYS list (ScoringSummaries tree) — cosmetic, optional.",
+    "teamBoxScore": true,
+    "teamStatsTable": "TeamStats",
+    "teamCacheFields": ["HomeTeamStatCache", "AwayTeamStatCache"],
+    "teamRecordComment": "STANDINGS live on the Team record (id 5917) as split W/L fields (NOT in TeamStats). For each merged game's two teams, copy these scalar fields from guest->host. Clean: a game's two teams are unaffected by the provisional ticker sims, so their Team-record deltas are purely the real game.",
+    "teamRecordFields": [
+      "HomeWin", "HomeLoss", "HomeTie", "RoadWin", "RoadLoss", "RoadTie",
+      "ConfWin", "ConfLoss", "ConfTie", "NonConfWin", "NonConfLoss", "NonConfTie",
+      "DivisionWin", "DivisionLoss", "DivisionTie", "OutDoorWin", "OutDoorLoss", "OutDoorTie",
+      "InDoorWin", "InDoorLoss", "InDoorTie", "OverTimeWin", "OverTimeLoss", "OverTimeTie",
+      "SeasonWinLossStreak", "ForcedStreak", "SeasonWinPct",
+      "CurSeasonConfStanding", "CurSeasonDivStanding", "CurSeasonLeagStanding",
+      "SeasonLeagPointsFor", "SeasonLeagPointsAgainst",
+      "SeasonDivPointsFor", "SeasonDivPointsAgainst",
+      "SeasonConfPointsFor", "SeasonConfPointsAgainst"
+    ],
+    "skipTables": ["GameOffensiveStats", "GameDefensiveStats", "GameKickingStats", "CareerOffensiveStats", "TeamStats", "PlayerAward", "Player"]
+  }
+}

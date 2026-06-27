@@ -1,0 +1,14 @@
+{
+  "title": "cfb27",
+  "displayName": "EA Sports College Football 27",
+  "schema": {
+    "comment": "CFB 27 schema will NOT ship with madden-franchise at launch. Day-1 steps: (1) extract franchise-schemas.ftx from the game with Frosty, (2) generate a schema via madden-franchise's schemaGenerator/generateSchemaV2, (3) point schemaDirectory at the folder containing it (or schemaOverride at the exact file).",
+    "schemaDirectory": null,
+    "schemaOverride": null
+  },
+  "tables": {
+    "comment": "UNKNOWN until launch. Run `node cli.js inspect <cfb27 save>` to dump real table names, then fill definitions. CFB tables may use college-specific names (e.g. recruiting, transfer portal, NIL). Start from the Madden config and adjust.",
+    "definitions": [],
+    "ignoreFields": ["__id", "isEmpty"]
+  }
+}

@@ -1,0 +1,43 @@
+:root {
+  --bg: #0f1216; --panel: #1a1f27; --line: #2b323d; --text: #e6e9ee;
+  --muted: #97a1b0; --accent: #3a7afe; --go: #2ea043; --warn: #b9892f; --err: #d9534f;
+}
+* { box-sizing: border-box; }
+body {
+  font: 14px/1.5 -apple-system, Segoe UI, Roboto, sans-serif;
+  background: var(--bg); color: var(--text); margin: 0; padding: 28px 32px; max-width: 880px;
+}
+h1 { font-size: 22px; margin: 0 0 4px; }
+h1 .sub { font-size: 13px; color: var(--muted); font-weight: 400; }
+.intro { color: var(--muted); margin: 0 0 22px; }
+.pickers { display: flex; flex-direction: column; gap: 16px; }
+.picker label { display: block; margin-bottom: 6px; font-weight: 600; }
+.picker .hint, .hint { color: var(--muted); font-weight: 400; font-size: 12px; }
+.row { display: flex; gap: 8px; }
+input {
+  flex: 1; background: var(--panel); border: 1px solid var(--line); color: var(--text);
+  border-radius: 7px; padding: 9px 11px; font-size: 12px; overflow: hidden; text-overflow: ellipsis;
+}
+button {
+  background: var(--panel); color: var(--text); border: 1px solid var(--line);
+  border-radius: 7px; padding: 9px 14px; cursor: pointer; font-size: 13px;
+}
+button:hover:not(:disabled) { border-color: var(--accent); }
+button:disabled { opacity: .45; cursor: not-allowed; }
+.actions { display: flex; gap: 12px; margin: 24px 0 8px; }
+button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+button.go { background: var(--go); border-color: var(--go); color: #fff; }
+.output {
+  margin-top: 18px; background: var(--panel); border: 1px solid var(--line);
+  border-radius: 10px; padding: 16px 18px;
+}
+.output.ok { border-color: #2c5a35; }
+.output.warn { border-color: var(--warn); }
+.output.error { border-color: var(--err); }
+.output h3 { margin: 0 0 10px; }
+.output ul { margin: 8px 0; padding-left: 20px; }
+.output code { background: #0b0e12; padding: 2px 6px; border-radius: 4px; font-size: 12px; word-break: break-all; }
+.warn-inline { color: var(--warn); }
+details summary { cursor: pointer; color: var(--muted); }
+.note { margin-top: 26px; color: var(--muted); font-size: 12px; border-top: 1px solid var(--line); padding-top: 14px; }
+.hidden { display: none; }
